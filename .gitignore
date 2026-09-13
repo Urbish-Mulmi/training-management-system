@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+
+# Build output
+dist/
+
+# Local documents and assets
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.md
