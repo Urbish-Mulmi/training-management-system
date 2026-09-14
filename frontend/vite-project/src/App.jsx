@@ -68,7 +68,7 @@ function ScrollToTop() {
 function App() {
   const location = useLocation();
 
-  console.log("env", import.meta.env.VITE_DEBUG);
+  // console.log("env", import.meta.env.VITE_DEBUG);
 
   return (
     <>
