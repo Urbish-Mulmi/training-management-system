@@ -30,7 +30,7 @@ import Enrollment from "./pages/public/Enrollment";
 import PaymentSuccess from "./pages/public/PaymentSuccess.jsx";
 import PaymentFailure from "./pages/public/PaymentFailure.jsx";
 import EsewaPayTest from "./pages/public/EsewaPayTest.jsx";
-
+import MyEnrollments from "./pages/public/MyEnrollments";
 // Layouts
 import AdminLayout from "./pages/layouts/AdminLayout.jsx";
 import InstructorLayout from "./pages/layouts/InstructorLayout.jsx";
@@ -102,6 +102,7 @@ function App() {
             <Route path="/payment/failure" element={<PaymentFailure />} />
             <Route path="/esewa-payment-help" element={<EsewaPayTest />} />
             <Route path="/esewapaymenthelp" element={<EsewaPayTest />} />
+            <Route path="/my-enrollments"  element={<MyEnrollments />}/>
 
             {/* Admin Routes */}
             <Route
