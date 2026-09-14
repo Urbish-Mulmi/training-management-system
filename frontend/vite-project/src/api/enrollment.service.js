@@ -1,37 +1,3 @@
-// import api from "./apiInstance";
-
-// // Create enrollment for logged-in user
-// export const createEnrollment = async (courseId) => {
-//   try {
-//     const res = await api.post("/enrollments", { courseId });
-//     console.log("Create enrollment success:", res.data);
-//     return res.data;
-//   } catch (error) {
-//     console.error(
-//       "Create enrollment error:",
-//       error.response?.data || error.message
-//     );
-//     throw error;
-//   }
-// };
-
-// // Get eSewa payment data
-// export const initiateEsewaPayment = async (enrollmentId) => {
-//   try {
-//     const res = await api.post(
-//       `/enrollments/${enrollmentId}/pay`
-//     );
-
-//     console.log("eSewa payment initiated:", res.data);
-//     return res.data;
-//   } catch (error) {
-//     console.error(
-//       "eSewa payment error:",
-//       error.response?.data || error.message
-//     );
-//     throw error;
-//   }
-// };
 import api from "./apiInstance";
 
 
@@ -58,6 +24,14 @@ export const createEnrollment = async (courseId) => {
   }
 };
 
+export const getMyEnrollments = async () => {
+  try {
+    const res = await api.get("/enrollments/my");
+    return res.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 
 export const initiateEsewaPayment = async (
   enrollmentId

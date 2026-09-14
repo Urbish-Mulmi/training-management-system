@@ -41,6 +41,39 @@ export const createEnrollment = async (req, res) => {
   }
 };
 
+export const getMyEnrollments = async (req, res) => {
+  try {
+    const studentId = req.verifyProof._id;
+
+    const enrollments = await Enrollment.find({
+      student: studentId
+    })
+      .populate(
+        "course",
+        "coursename fee duration unit"
+      )
+      .populate(
+        "batch",
+        "batchname startDate endDate"
+      )
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      message: "My enrollments fetched successfully",
+      enrollments
+    });
+
+  } catch (error) {
+    console.error(
+      "Get my enrollments error:",
+      error
+    );
+
+    return res.status(500).json({
+      message: error.message
+    });
+  }
+};
 
 export const initiateEsewaPayment = async (req, res) => {
   try {

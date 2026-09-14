@@ -1,44 +1,8 @@
-// import express from "express";
-
-// import {
-//   createEnrollment,
-//   initiateEsewaPayment,
-//   verifyEsewaPayment,
-//   esewaPaymentFailure
-// } from "../controllers/enrollment.controller.js";
-
-// import { verifyToken } from "../middlewares/auth.middleware.js";
-
-// const enrollmentRoutes = express.Router();
-
-// enrollmentRoutes.post(
-//   "/",
-//   verifyToken,
-//   createEnrollment
-// );
-
-// enrollmentRoutes.post(
-//   "/:enrollmentId/pay",
-//   verifyToken,
-//   initiateEsewaPayment
-// );
-
-// enrollmentRoutes.get(
-//   "/payment/success",
-//   verifyEsewaPayment
-// );
-
-// enrollmentRoutes.get(
-//   "/payment/failure",
-//   esewaPaymentFailure
-// );
-
-// export default enrollmentRoutes;
-
 import express from "express";
 
 import {
   createEnrollment,
+   getMyEnrollments,
   initiateEsewaPayment,
   verifyEsewaPayment,
   esewaPaymentFailure,
@@ -60,17 +24,15 @@ const enrollmentRoutes = express.Router();
 | Student enrollment
 |--------------------------------------------------------------------------
 */
-
+enrollmentRoutes.get(
+  "/my",  verifyToken,  getMyEnrollments
+);
 enrollmentRoutes.post(
-  "/",
-  verifyToken,
-  createEnrollment
+  "/",  verifyToken,  createEnrollment
 );
 
 enrollmentRoutes.post(
-  "/:enrollmentId/pay",
-  verifyToken,
-  initiateEsewaPayment
+  "/:enrollmentId/pay",verifyToken,  initiateEsewaPayment
 );
 
 
@@ -80,14 +42,10 @@ enrollmentRoutes.post(
 |--------------------------------------------------------------------------
 */
 
-enrollmentRoutes.get(
-  "/payment/success",
-  verifyEsewaPayment
+enrollmentRoutes.get(  "/payment/success",  verifyEsewaPayment
 );
 
-enrollmentRoutes.get(
-  "/payment/failure",
-  esewaPaymentFailure
+enrollmentRoutes.get(  "/payment/failure",  esewaPaymentFailure
 );
 
 
