@@ -83,8 +83,15 @@ export const loginUser = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.cookie("tms_token", token);
+    const isProduction = process.env.NODE_ENV === "production";
 
+    res.cookie("tms_token", token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    });
+
+  
     return res.status(200).json({
       message: "User Login Success | tms_token created",
       success: true,
