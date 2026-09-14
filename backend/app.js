@@ -21,7 +21,7 @@ const app = express();
 // cors must be defined so that  backend allows specified frontend url to access backend api requests. otherwise it will be blocked .
 // purpose of below code is to accepts api requests from specified url hosted address
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     credentials: true
 }));
 
