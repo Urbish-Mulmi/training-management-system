@@ -3,6 +3,7 @@ import Enrollment from "../models/enrollment.model.js";
 import Course from "../models/course.model.js";
 import userModel from "../models/user.models.js";
 import Batch from "../models/batch.model.js";
+import { createInvitation } from "../services/invitation.service.js";
 
 
 export const createEnrollment = async (req, res) => {
@@ -261,176 +262,59 @@ export const getPendingPaidEnrollments = async (req, res) => {
 | ADMIN: Get available batches for a course
 |--------------------------------------------------------------------------
 */
-
 export const getBatchesForCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
-
-    const batches = await Batch.find({
-      course: courseId,
-      isCompleted: false
-    })
-      .populate("instructor", "fullname email")
-      .sort({ startDate: 1 });
+    const batches = await Batch.find({ course: courseId, isCompleted: false })
+      .populate("instructor", "fullname email");
 
     return res.status(200).json({
-      message: "Batches fetched successfully",
+      success: true,
       batches
     });
   } catch (error) {
-    console.error(
-      "Get batches for course error:",
-      error
-    );
-
-    return res.status(500).json({
-      message: error.message
-    });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN: Approve enrollment and assign batch
+| ADMIN: Approve Enrollment, Assign Batch & Send Invitation
 |--------------------------------------------------------------------------
 */
-
 export const approveEnrollment = async (req, res) => {
   try {
     const { enrollmentId } = req.params;
     const { batchId } = req.body;
+    const adminId = req.verifyProof._id;
 
-    if (!batchId) {
-      return res.status(400).json({
-        message: "Batch ID is required"
-      });
-    }
-
-    const enrollment = await Enrollment.findById(
-      enrollmentId
-    );
-
+    const enrollment = await Enrollment.findById(enrollmentId);
     if (!enrollment) {
-      return res.status(404).json({
-        message: "Enrollment not found"
-      });
+      return res.status(404).json({ success: false, message: "Enrollment not found" });
     }
 
-    /*
-     * Payment must be completed before approval.
-     */
     if (enrollment.paymentStatus !== "paid") {
-      return res.status(400).json({
-        message: "Payment has not been completed"
-      });
+      return res.status(400).json({ success: false, message: "Cannot approve unpaid enrollment" });
     }
 
-    /*
-     * Prevent approving the same enrollment twice.
-     */
-    if (enrollment.enrollmentStatus !== "pending") {
-      return res.status(400).json({
-        message: "Enrollment has already been processed"
-      });
-    }
-
-    const batch = await Batch.findById(batchId);
-
-    if (!batch) {
-      return res.status(404).json({
-        message: "Batch not found"
-      });
-    }
-
-    /*
-     * The selected batch MUST belong to the
-     * course the student actually enrolled in.
-     */
-    if (
-      String(batch.course) !==
-      String(enrollment.course)
-    ) {
-      return res.status(400).json({
-        message:
-          "Selected batch does not belong to this course"
-      });
-    }
-
-    /*
-     * Find the user.
-     */
-    const student = await userModel.findById(
-      enrollment.student
-    );
-
-    if (!student) {
-      return res.status(404).json({
-        message: "Student user not found"
-      });
-    }
-
-    /*
-     * Promote guest/user to student.
-     */
-    student.role = "student";
-
-    await student.save();
-
-    /*
-     * Assign batch to enrollment.
-     */
-    enrollment.batch = batch._id;
+    // 1. Assign batch and mark status
+    enrollment.batch = batchId;
     enrollment.enrollmentStatus = "approved";
-
     await enrollment.save();
 
-    /*
-     * Add student to batch.
-     * Prevent duplicate student IDs.
-     */
-    const alreadyInBatch = batch.students.some(
-      studentId =>
-        String(studentId) ===
-        String(enrollment.student)
-    );
-
-    if (!alreadyInBatch) {
-      batch.students.push(enrollment.student);
-      await batch.save();
-    }
-
-    /*
-     * Return updated enrollment.
-     */
-    const updatedEnrollment =
-      await Enrollment.findById(enrollment._id)
-        .populate(
-          "student",
-          "fullname email role"
-        )
-        .populate(
-          "course",
-          "coursename fee duration unit"
-        )
-        .populate(
-          "batch",
-          "batchname startDate endDate"
-        );
+    // 2. Trigger your existing invitation service (generates token & sends email)
+    await createInvitation({
+      userId: enrollment.student,
+      role: 'student',
+      createdBy: adminId
+    });
 
     return res.status(200).json({
-      message: "Enrollment approved successfully",
-      enrollment: updatedEnrollment
+      success: true,
+      message: "Batch assigned and onboarding invitation email sent successfully!"
     });
-
   } catch (error) {
-    console.error(
-      "Approve enrollment error:",
-      error
-    );
-
-    return res.status(500).json({
-      message: error.message
-    });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };

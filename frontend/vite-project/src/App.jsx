@@ -26,11 +26,11 @@ import JobPlacement from "./pages/public/JobPlacement.jsx";
 import Blogs from "./pages/public/Blogs";
 import BlogDetails from "./pages/public/BlogDetails";
 import Contact from "./pages/public/Contact.jsx";
-import Enrollment from "./pages/public/Enrollment";
+import Enrollment from "./pages/public/Enrollment.jsx";
 import PaymentSuccess from "./pages/public/PaymentSuccess.jsx";
 import PaymentFailure from "./pages/public/PaymentFailure.jsx";
 import EsewaPayTest from "./pages/public/EsewaPayTest.jsx";
-import MyEnrollments from "./pages/public/MyEnrollments";
+import MyEnrollments from "./pages/public/MyEnrollments.jsx";
 // Layouts
 import AdminLayout from "./pages/layouts/AdminLayout.jsx";
 import InstructorLayout from "./pages/layouts/InstructorLayout.jsx";
