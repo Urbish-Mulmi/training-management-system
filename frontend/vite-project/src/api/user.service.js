@@ -74,3 +74,8 @@ export const roleUpdateUser = async (id, role) => {
     throw error;
   }
 }
+
+export const getUserDetails = async (id) => {
+  const res = await api.get(`/users/${id}/details`);
+  return res.data;
+};

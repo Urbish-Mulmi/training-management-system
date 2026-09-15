@@ -27,17 +27,19 @@ router.route('/batch/:batchId')
   .get(isStudentOrInstructor, getBatchAssignment)
   .post(isInstructor, uploadPdf.single('assignmentFile'), createBatchAssignment);
 
-// 2. Direct Assignment & Submission Listing Actions
+// 2. Delete Assignment 
 router.delete('/:assignmentId', isInstructor, deleteBatchAssignment);
-router.post('/:assignmentId/submit', isStudent, uploadPdf.single('submissionFile'), submitBatchAssignment);
 
-// 🚨 ADD THIS: Route for instructor to view all submissions for a specific assignment
+// 3. Route for instructor to view all submissions for a specific assignment
 router.get('/:assignmentId/submissions', isInstructor, getAssignmentSubmissions);
 
-// 3. Direct Submission Actions (Grading)
+// 4.  Submission Grading
 router.patch('/submissions/:submissionId', isInstructor, gradeBatchAssignment);
 
-// Add this under your student/instructor routes
+// 5. Student submit assignment
+router.post('/:assignmentId/submit', isStudent, uploadPdf.single('submissionFile'), submitBatchAssignment);
+
+// 6. Student see own submission for a specific assignment
 router.get('/:assignmentId/my-submission', isStudent, getMySubmission);
 
 export default router;

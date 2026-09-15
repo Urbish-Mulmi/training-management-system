@@ -22,6 +22,8 @@ const userSchema = new mongoose.Schema(
       type: Boolean,default: true,
     },
 
+
+
     instructorProfile: {
       bio: {
         type: String,default: "",
@@ -48,6 +50,9 @@ const userSchema = new mongoose.Schema(
       },
 
       githubUrl: { type: String, default: "" },
+      phone:{
+      type:String, default: "",
+    },
     },
   },
   {

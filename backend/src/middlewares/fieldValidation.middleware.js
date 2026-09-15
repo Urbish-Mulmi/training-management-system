@@ -21,6 +21,12 @@ export const registerValidation = [
     .withMessage("Password is required")
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 characters"),
+  
+body("phone")
+  .optional({ values: "falsy" })
+  .trim()
+  .matches(/^\+[1-9]\d{9,14}$/)
+  .withMessage("Enter a valid phone number"),
 ];
 
 // Login Validation

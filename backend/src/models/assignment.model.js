@@ -12,6 +12,9 @@ const assignmentSchema = new mongoose.Schema(
       ref: 'Batch', 
       required: [true,'Batch is required' ]
     },
+    description:{
+      type:String,trim:true, default:"",
+    },
     dueDate: { 
       type: Date, 
       required: [true,'Due date is required' ] 
