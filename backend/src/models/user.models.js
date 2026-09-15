@@ -21,7 +21,9 @@ const userSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,default: true,
     },
-
+    phone:{
+      type:String, default: "",
+    },
 
 
     instructorProfile: {
@@ -50,9 +52,7 @@ const userSchema = new mongoose.Schema(
       },
 
       githubUrl: { type: String, default: "" },
-      phone:{
-      type:String, default: "",
-    },
+      
     },
   },
   {
