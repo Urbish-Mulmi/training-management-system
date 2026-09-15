@@ -2,6 +2,7 @@ import express from "express";
 
 import {
   registerUser,  loginUser,  homePageBackend,  getAllUser,  logoutUser,  getMe,  updateUserRole,deleteUser,
+  getUserDetails,
 } from "../controllers/user.controller.js";
 
 import {  registerValidation,  loginValidation,  validate,
@@ -23,6 +24,8 @@ userRoutes  .route("/logoutUser")  .post(logoutUser);
 userRoutes.route("/get-me")  .get(verifyToken, getMe);
 
 userRoutes.route("/get-all-user").get(verifyToken, isAdmin, getAllUser);
+
+userRoutes.route("/:id/details")  .get(verifyToken, isAdmin, getUserDetails);
 
 userRoutes.route("/:id/update-role").patch(verifyToken, isAdmin, updateUserRole);
 

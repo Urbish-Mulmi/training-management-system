@@ -9,8 +9,11 @@ function Register() {
   const [form, setForm] = useState({
     fullname: "",
     email: "",
+    phone: "",
     password: "",
   });
+
+  const [countryCode, setCountryCode] = useState("+977");
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -24,7 +27,14 @@ function Register() {
       setError("");
       setMessage("");
 
-      const response = await signUpUser(form);
+      const submitForm = {
+        ...form,
+        phone: form.phone
+          ? `${countryCode}${form.phone}`
+          : "",
+      };
+
+      const response = await signUpUser(submitForm);
 
       setMessage(response.message);
     } catch (error) {
@@ -107,6 +117,44 @@ function Register() {
                 required
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-md text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition"
               />
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label
+                htmlFor="phone"
+                className="block text-xs font-medium text-gray-700 mb-1.5"
+              >
+                Phone number <span className="text-gray-400">(optional)</span>
+              </label>
+
+              <div className="flex">
+                <select
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value)}
+                  className="w-24 px-2 py-2.5 border border-gray-300 rounded-l-md bg-white text-sm text-gray-900 outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition"
+                >
+                  <option value="+977">🇳🇵 +977</option>
+                  <option value="+91">🇮🇳 +91</option>
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+44">🇬🇧 +44</option>
+                  <option value="+61">🇦🇺 +61</option>
+                </select>
+
+                <input
+                  id="phone"
+                  type="tel"
+                  placeholder="9800000000"
+                  value={form.phone}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      phone: e.target.value,
+                    })
+                  }
+                  className="flex-1 px-3 py-2.5 border border-l-0 border-gray-300 rounded-r-md text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition"
+                />
+              </div>
             </div>
 
             {/* Password */}
@@ -196,4 +244,3 @@ function Register() {
 }
 
 export default Register;
-
