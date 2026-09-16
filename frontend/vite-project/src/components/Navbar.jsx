@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../useContext/AuthContext.jsx";
 
 const Navbar = () => {
   const { user } = useAuth();
+
   const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Keep search box synchronized with URL
+  useEffect(() => {
+    setSearch(searchParams.get("search") || "");
+  }, [searchParams]);
 
   // Prevent background body scrolling when the side drawer is open
   useEffect(() => {
@@ -13,6 +23,7 @@ const Navbar = () => {
     } else {
       document.body.style.overflow = "unset";
     }
+
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -25,13 +36,29 @@ const Navbar = () => {
 
   const mobileNavLinkStyle = ({ isActive }) =>
     `block text-base font-medium transition-colors duration-200 py-2.5 px-4 rounded-lg ${
-      isActive ? "text-blue-600 bg-blue-50" : "text-gray-700 hover:bg-gray-50"
+      isActive
+        ? "text-blue-600 bg-blue-50"
+        : "text-gray-700 hover:bg-gray-50"
     }`;
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+
+    const query = search.trim();
+
+    if (!query) {
+      navigate("/");
+      return;
+    }
+
+    navigate(`/?search=${encodeURIComponent(query)}`);
+    setIsOpen(false);
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        
+
         {/* Left - Logo */}
         <NavLink to="/" className="flex items-center gap-2 group">
           <div className="w-8 h-8 rounded-md bg-blue-600 text-white flex items-center justify-center text-xs font-bold group-hover:bg-blue-700 transition-colors">
@@ -42,13 +69,14 @@ const Navbar = () => {
             <p className="text-lg font-semibold tracking-tight text-gray-900 leading-none">
               TMS
             </p>
+
             <p className="text-[9px] text-gray-400 tracking-widest mt-0.5">
               LEARN. GROW. ACHIEVE.
             </p>
           </div>
         </NavLink>
 
-        {/* Center - Desktop Navigation Links (> 964px) */}
+        {/* Center - Desktop Navigation Links */}
         <div className="hidden min-[965px]:flex items-center gap-6 lg:gap-7">
           <NavLink to="/" className={navLinkStyle}>
             Home
@@ -70,6 +98,40 @@ const Navbar = () => {
             Testimonials
           </NavLink>
 
+          {/* Course Search */}
+          <form onSubmit={handleSearch} className="flex items-center ml-2">
+            <div className="relative">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search courses..."
+                className="w-44 lg:w-52 pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-md outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
+              />
+
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 1 1 14 0Z"
+                />
+              </svg>
+            </div>
+
+            <button
+              type="submit"
+              className="ml-2 px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition"
+            >
+              Search
+            </button>
+          </form>
+
           {user?.role === "admin" && (
             <NavLink to="/admin" className={navLinkStyle}>
               Admin Dashboard
@@ -89,8 +151,9 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Right - Desktop User Actions (> 964px) */}
+        {/* Right - Desktop User Actions */}
         <div className="hidden min-[965px]:flex items-center gap-4">
+
           {user ? (
             <>
               <NavLink to="/get-me" className="flex items-center gap-2 group">
@@ -102,6 +165,7 @@ const Navbar = () => {
                   <p className="text-xs font-semibold text-gray-900 leading-none">
                     {user?.fullname}
                   </p>
+
                   <p className="text-[10px] text-gray-400 capitalize mt-1">
                     {user?.role}
                   </p>
@@ -134,99 +198,192 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Hamburger Button (<= 964px) */}
+        {/* Mobile Hamburger Button */}
         <button
           onClick={() => setIsOpen(true)}
           className="min-[965px]:hidden text-gray-600 hover:text-gray-900 focus:outline-none p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
           aria-label="Open Menu"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           </svg>
         </button>
       </div>
 
-      {/* Backdrop Overlay with smooth transition */}
-      <div 
+      {/* Backdrop Overlay */}
+      <div
         onClick={() => setIsOpen(false)}
         className={`fixed inset-0 bg-black/40 z-50 transition-opacity duration-300 min-[965px]:hidden backdrop-blur-xs ${
-          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          isOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
       />
 
       {/* Right Side Sliding Panel */}
-      <div 
+      <div
         className={`fixed top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col min-[965px]:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
+
         {/* Panel Header */}
         <div className="flex items-center justify-between px-6 h-16 border-b border-gray-100 flex-shrink-0">
-          <p className="text-sm font-semibold text-gray-900 tracking-wide">Menu</p>
+          <p className="text-sm font-semibold text-gray-900 tracking-wide">
+            Menu
+          </p>
+
           <button
             onClick={() => setIsOpen(false)}
             className="text-gray-400 hover:text-gray-700 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
             aria-label="Close Menu"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
 
-        {/* Panel Body Links (Scrollable if content overflows) */}
+        {/* Panel Body */}
         <div className="flex-1 overflow-y-auto px-4 py-6 space-y-1.5">
-          <NavLink to="/" onClick={() => setIsOpen(false)} className={mobileNavLinkStyle}>
+
+          {/* Mobile Course Search */}
+          <form
+            onSubmit={handleSearch}
+            className="mb-5"
+          >
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
+              Search Courses
+            </p>
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search courses..."
+                className="flex-1 min-w-0 px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
+              />
+
+              <button
+                type="submit"
+                className="px-3 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
+              >
+                Search
+              </button>
+            </div>
+          </form>
+
+          <NavLink
+            to="/"
+            onClick={() => setIsOpen(false)}
+            className={mobileNavLinkStyle}
+          >
             Home
           </NavLink>
 
-          <NavLink to="/blogs" onClick={() => setIsOpen(false)} className={mobileNavLinkStyle}>
+          <NavLink
+            to="/blogs"
+            onClick={() => setIsOpen(false)}
+            className={mobileNavLinkStyle}
+          >
             Blogs
           </NavLink>
 
-          <NavLink to="/job-placement" onClick={() => setIsOpen(false)} className={mobileNavLinkStyle}>
+          <NavLink
+            to="/job-placement"
+            onClick={() => setIsOpen(false)}
+            className={mobileNavLinkStyle}
+          >
             Job Placement
           </NavLink>
 
-          <NavLink to="/contact" onClick={() => setIsOpen(false)} className={mobileNavLinkStyle}>
+          <NavLink
+            to="/contact"
+            onClick={() => setIsOpen(false)}
+            className={mobileNavLinkStyle}
+          >
             Contact
           </NavLink>
 
-          <NavLink to="/testimonials" onClick={() => setIsOpen(false)} className={mobileNavLinkStyle}>
+          <NavLink
+            to="/testimonials"
+            onClick={() => setIsOpen(false)}
+            className={mobileNavLinkStyle}
+          >
             Testimonials
           </NavLink>
 
           {user?.role === "admin" && (
-            <NavLink to="/admin" onClick={() => setIsOpen(false)} className={mobileNavLinkStyle}>
+            <NavLink
+              to="/admin"
+              onClick={() => setIsOpen(false)}
+              className={mobileNavLinkStyle}
+            >
               Admin Dashboard
             </NavLink>
           )}
 
           {user?.role === "instructor" && (
-            <NavLink to="/instructor" onClick={() => setIsOpen(false)} className={mobileNavLinkStyle}>
+            <NavLink
+              to="/instructor"
+              onClick={() => setIsOpen(false)}
+              className={mobileNavLinkStyle}
+            >
               Instructor Dashboard
             </NavLink>
           )}
 
           {user?.role === "student" && (
-            <NavLink to="/student" onClick={() => setIsOpen(false)} className={mobileNavLinkStyle}>
+            <NavLink
+              to="/student"
+              onClick={() => setIsOpen(false)}
+              className={mobileNavLinkStyle}
+            >
               Student Dashboard
             </NavLink>
           )}
         </div>
 
-        {/* Panel Footer / User Actions */}
+        {/* Panel Footer */}
         <div className="p-5 border-t border-gray-100 bg-gray-50/50 flex-shrink-0">
+
           {user ? (
             <div className="space-y-4">
-              <NavLink to="/get-me" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
+              <NavLink
+                to="/get-me"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3"
+              >
                 <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-xs font-semibold text-blue-600">
                   {user?.fullname?.charAt(0)?.toUpperCase()}
                 </div>
+
                 <div>
                   <p className="text-xs font-semibold text-gray-900 leading-none">
                     {user?.fullname}
                   </p>
+
                   <p className="text-[10px] text-gray-400 capitalize mt-1">
                     {user?.role}
                   </p>

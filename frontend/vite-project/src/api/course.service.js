@@ -55,6 +55,21 @@ export const editCourse = async (id, courseData) => {
   }
 };
 
+export const searchCourses = async (query) => {
+  try {
+    const res = await api.get(
+      `/course/search?q=${encodeURIComponent(query)}`
+    );
+
+    return res.data;
+  } catch (error) {
+    console.error(
+      "Search courses error:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
 
 // ======================================================
 // COMPATIBILITY ALIASES (Prevents Vite/UI crashes during migration)

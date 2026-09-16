@@ -188,3 +188,39 @@ export const editCourse = async (req, res) => {
     });
   }
 };
+
+// SEARCH COURSE implemented using (query params)and (.find along with regex , API debounce not yet used as this search happens only after pressing search button not live search)
+export const searchCourse = async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    if (!q || !q.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Search query is required.",
+      });
+    }
+
+    const searchedData = await courseModel.find({
+      coursename: {
+        $regex: q.trim(),
+        $options: "i",
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: searchedData.length
+        ? "Courses found successfully."
+        : "No courses found.",
+      courseCount: searchedData.length,
+      courses: searchedData,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error searching courses.",
+      error: error.message,
+    });
+  }
+};
