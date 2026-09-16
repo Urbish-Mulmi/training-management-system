@@ -300,6 +300,7 @@ export default function CourseManagement() {
                     value={courseData.duration}
                     onChange={handleChange}
                     min="1"
+                     step="0.1"
                     required
                     className="w-full border border-gray-300 p-2.5 rounded-lg text-sm"
                   />
