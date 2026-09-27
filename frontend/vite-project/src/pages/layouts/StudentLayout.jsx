@@ -13,9 +13,9 @@ const StudentLayout = () => {
             Student Dashboard
           </h1>
 
-          <p className="text-xs text-gray-500 mt-0.5">
+          {/* <p className="text-xs text-gray-500 mt-0.5">
             Access your enrolled courses, classrooms, and learning resources.
-          </p>
+          </p> */}
         </div>
 
         <nav className="p-4 space-y-1">
