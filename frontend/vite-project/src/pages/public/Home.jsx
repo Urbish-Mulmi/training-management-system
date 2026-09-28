@@ -12,7 +12,7 @@ const Home = () => {
   const searchQuery = searchParams.get("search") || "";
 
   const [courses, setCourses] = useState([]);
-  const [totalCourseCount, setTotalCourseCount] = useState(0);
+  const [totalCourseCount, setTotalCourseCount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -54,6 +54,7 @@ const Home = () => {
       try {
         setLoading(true);
         setError("");
+        setCourses([]);
 
         let res;
 
@@ -130,7 +131,7 @@ const Home = () => {
 
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-5">
               <p className="text-2xl font-bold text-gray-900">
-                {totalCourseCount}
+                {totalCourseCount === null ? "loading" : totalCourseCount}
               </p>
 
               <p className="text-xs text-gray-500 mt-1">
@@ -228,14 +229,23 @@ const Home = () => {
               <div className="w-12 h-12 mx-auto rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-lg">
                 ?
               </div>
+              
+                <h3 className="text-sm font-semibold text-gray-900 mt-4">
+                  Course not found
+                </h3>
 
-              <h3 className="text-sm font-semibold text-gray-900 mt-4">
-                Course not found
-              </h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  No courses matched "{searchQuery}".
+                </p>
 
-              <p className="text-xs text-gray-500 mt-1">
-                No courses matched "{searchQuery}".
-              </p>
+                <NavLink
+                  to="/"
+                  className="inline-block mt-5 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition"
+                >
+                  View All Available Courses
+                </NavLink>
+
+              
 
             </div>
           )}
