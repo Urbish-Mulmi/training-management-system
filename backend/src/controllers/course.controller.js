@@ -6,6 +6,7 @@ import courseModel from "../models/course.model.js";
 // ======================================================
 
 export const getAllCourse = async (req, res) => {
+   console.log("GET ALL COURSE CONTROLLER HIT");
   try {
     const start = performance.now();
     const data = await courseModel.find();
