@@ -37,12 +37,19 @@ const Login = () => {
 
       const userdata = await fetchCurrentUser();
 
-      if (userdata?.role === "admin") {
-        navigate("/admin/users");
-      } else {
-        navigate(location.state?.from || "/");
+      // creating a js dictionary to implement role based redirect upon login
+      const redirectRole = {
+        student : '/student/my-courses',
+        admin : '/admin/users',
+        instructor : '/instructor/courses',
       }
 
+      // to access object value using a dynamic key (bracket notation)
+      // redirectRole[userdata?.role];
+
+        navigate(redirectRole[userdata?.role] || "/", {
+          replace: true,
+        });      
       setMessage(response.message);
     } catch (error) {
       setError(
