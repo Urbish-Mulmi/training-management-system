@@ -7,7 +7,10 @@ import courseModel from "../models/course.model.js";
 
 export const getAllCourse = async (req, res) => {
   try {
+    const start = performance.now();
     const data = await courseModel.find();
+    const dbTime = performance.now() - start;
+    console.log(`MongoDB query: ${dbTime.toFixed(2)} ms`);
 
     return res.status(200).json({
       success: true,
