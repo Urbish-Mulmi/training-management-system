@@ -1,5 +1,29 @@
 import jwt from 'jsonwebtoken';
 import userModel from "../models/user.models.js"
+
+export const optionalAuth = async (req, res, next) => {
+  const token = req.cookies?.tms_token;
+
+  // No cookie = guest
+  if (!token) {
+    req.verifyProof = null;
+    return next();
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const user = await userModel.findById(decoded.id);
+
+    req.verifyProof = user || null;
+
+    next();
+  } catch (error) {
+    // Invalid/expired token = treat as guest
+    req.verifyProof = null;
+    next();
+  }
+};
+
 export const verifyToken = async (req,res,next) =>{
   
   const token = req.cookies?.tms_token;

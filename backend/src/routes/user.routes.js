@@ -8,7 +8,7 @@ import {
 import {  registerValidation,  loginValidation,  validate,
 } from "../middlewares/fieldValidation.middleware.js";
 
-import {  verifyToken,  isAdmin,
+import {  verifyToken,  isAdmin, optionalAuth,
 } from "../middlewares/auth.middleware.js";
 
 const userRoutes = express.Router();
@@ -21,7 +21,7 @@ userRoutes.route("/login").post(loginValidation, validate, loginUser);
 
 userRoutes  .route("/logoutUser")  .post(logoutUser);
 
-userRoutes.route("/get-me")  .get(verifyToken, getMe);
+userRoutes.get("/get-me", optionalAuth, getMe);
 
 userRoutes.route("/get-all-user").get(verifyToken, isAdmin, getAllUser);
 
