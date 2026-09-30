@@ -26,63 +26,43 @@ const Home = () => {
     }
   }, [searchQuery]);
 
-  // Get total number of courses
-  useEffect(() => {
-    const fetchTotalCourses = async () => {
-      try {
-        const res = await getAllCourse();
 
-        const courseList = Array.isArray(res)
-          ? res
-          : res.data || res.courses || [];
 
-        setTotalCourseCount(courseList.length);
-      } catch (error) {
-        console.error(
-          "Failed to get total course count:",
-          error.response?.data || error.message
-        );
+
+  // Get courses / Get total number of courses/search results/ 
+useEffect(() => {
+  const fetchCourses = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      setCourses([]);
+
+      let res;
+
+      if (searchQuery.trim()) {
+        res = await searchCourses(searchQuery);
+      } else {
+        res = await getAllCourse();
+        setTotalCourseCount(res.courseCount);
       }
-    };
 
-    fetchTotalCourses();
-  }, []);
+      const courseList = res.courses || [];
 
-  // Get courses / search results
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        setLoading(true);
-        setError("");
-        setCourses([]);
+      setCourses(courseList);
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+          "Failed to load courses."
+      );
 
-        let res;
+      setCourses([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        if (searchQuery.trim()) {
-          res = await searchCourses(searchQuery);
-        } else {
-          res = await getAllCourse();
-        }
-
-        const courseList = Array.isArray(res)
-          ? res
-          : res.data || res.courses || [];
-
-        setCourses(courseList);
-      } catch (error) {
-        setError(
-          error.response?.data?.message ||
-            "Failed to load courses."
-        );
-
-        setCourses([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourses();
-  }, [searchQuery]);
+  fetchCourses();
+}, [searchQuery]);
 
   return (
     <div className="bg-gray-50">
