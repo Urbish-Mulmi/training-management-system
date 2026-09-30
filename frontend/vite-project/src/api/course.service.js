@@ -7,7 +7,7 @@ import api from "./apiInstance.js";
 export const getAllCourse = async () => {
   try {
     const res = await api.get("/course/get-all-course");
-    console.log("All courses:", res.data);
+    console.log("Course Fetch Success");
     return res.data;
   } catch (error) {
     console.error("Get all courses error:", error.response?.data || error.message);
