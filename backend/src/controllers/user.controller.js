@@ -15,16 +15,138 @@ export const homePageBackend = (req, res) => {
   });
 };
 
+// cloudfare based captcha setup
+const verifyTurnstileToken = async (token) => {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+
+  if (!secret) {
+    throw new Error("TURNSTILE_SECRET_KEY is not configured");
+  }
+
+  const response = await fetch(
+    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({
+        secret,
+        response: token
+      })
+    }
+  );
+
+if (!response.ok) {
+  const responseBody = await response.text();
+
+  console.error("Turnstile Siteverify HTTP error:", {
+    status: response.status,
+    statusText: response.statusText,
+    body: responseBody
+  });
+
+  throw new Error(`Cloudflare Siteverify returned HTTP ${response.status}`);
+}
+
+  const result = await response.json();
+
+  return result.success === true;
+};
+
+// export const registerUser = async (req, res) => {
+//   try {
+//     const { fullname, email, password, phone } = req.body;
+
+//     const existingUser = await userModel.findOne({ email });
+
+//     if (existingUser) {
+//       return res.status(400).json({
+//         message: "User with this email is already registered",
+//         success: false,
+//       });
+//     }
+
+//     const hashPassword = await bcrypt.hash(password, 10);
+
+//     const user = await userModel.create({
+//       fullname,
+//       email,
+//       password: hashPassword,
+//       phone,
+//     });
+
+//     return res.status(201).json({
+//       message: "User Register Success",
+//       success: true,
+//       user: {
+//         fullname: user.fullname,
+//         email: user.email,
+//       },
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "Error occurred in register user",
+//       success: false,
+//       error: error.message,
+//     });
+//   }
+// };
+
+// updated registerUser controller function with CAPTCHA setup
 export const registerUser = async (req, res) => {
   try {
-    const { fullname, email, password, phone } = req.body;
+    const {
+      fullname,
+      email,
+      password,
+      phone,
+      turnstileToken
+    } = req.body;
+
+    if (
+      typeof turnstileToken !== "string" ||
+      !turnstileToken.trim()
+    ) {
+      return res.status(400).json({
+        message: "Please complete the CAPTCHA verification",
+        success: false
+      });
+    }
+
+    let isCaptchaValid;
+
+    try {
+      isCaptchaValid = await verifyTurnstileToken(turnstileToken);
+    } catch (error) {
+      console.error("Turnstile verification error:", error.message);
+
+      if (!process.env.TURNSTILE_SECRET_KEY) {
+        return res.status(500).json({
+          message: "CAPTCHA verification is not configured",
+          success: false
+        });
+      }
+
+      return res.status(502).json({
+        message: "CAPTCHA verification service is unavailable",
+        success: false
+      });
+    }
+
+    if (!isCaptchaValid) {
+      return res.status(400).json({
+        message: "CAPTCHA verification failed. Please try again.",
+        success: false
+      });
+    }
 
     const existingUser = await userModel.findOne({ email });
 
     if (existingUser) {
       return res.status(400).json({
         message: "User with this email is already registered",
-        success: false,
+        success: false
       });
     }
 
@@ -34,7 +156,7 @@ export const registerUser = async (req, res) => {
       fullname,
       email,
       password: hashPassword,
-      phone,
+      phone
     });
 
     return res.status(201).json({
@@ -42,17 +164,18 @@ export const registerUser = async (req, res) => {
       success: true,
       user: {
         fullname: user.fullname,
-        email: user.email,
-      },
+        email: user.email
+      }
     });
   } catch (error) {
     return res.status(500).json({
       message: "Error occurred in register user",
       success: false,
-      error: error.message,
+      error: error.message
     });
   }
 };
+
 
 export const loginUser = async (req, res) => {
   try {

@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { signUpUser } from "../../api/auth.service";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 function Register() {
   const navigate = useNavigate();
   const location = useLocation();
+  // Stores the token returned after Turnstile verification succeeds.
+  const [captchaToken, setCaptchaToken] = useState("");
 
   const [form, setForm] = useState({
     fullname: "",
@@ -32,6 +35,8 @@ function Register() {
         phone: form.phone
           ? `${countryCode}${form.phone}`
           : "",
+        // Send the CAPTCHA token to the backend for server-side verification.
+        turnstileToken: captchaToken
       };
 
       const response = await signUpUser(submitForm);
@@ -182,6 +187,16 @@ function Register() {
               />
             </div>
 
+            {/* CAPTCHA: obtains a token that the backend must verify with Cloudflare. */}
+            <div>
+              <Turnstile
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                onSuccess={(token) => setCaptchaToken(token)}
+                onExpire={() => setCaptchaToken("")}
+                onError={() => setCaptchaToken("")}
+              />
+            </div>
+            
             {/* Message */}
             {message && (
               <div className="bg-green-50 border border-green-200 rounded-md px-3 py-2">
